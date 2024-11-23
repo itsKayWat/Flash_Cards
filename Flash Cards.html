@@ -1,0 +1,1076 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Enhanced Flashcard App</title>
+  <style>
+    /* Global and Layout Styles */
+    body {
+      background-color: #0B0F1C;
+      color: #EAEAEA;
+      font-family: 'Arial', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      overflow-x: hidden; /* Prevent horizontal overflow */
+      transition: background-color 0.3s, color 0.3s; /* Smooth transition for dark mode */
+    }
+
+    /* Header Styles */
+    header {
+      width: 100%;
+      background-color: #1F2A44;
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 1000;
+      box-sizing: border-box;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 1.8rem;
+    }
+
+    header .header-buttons {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap; /* Allow buttons to wrap */
+      align-items: center;
+    }
+
+    header button {
+      padding: 8px 16px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      color: #EAEAEA;
+      background: linear-gradient(145deg, #007BFF, #0056b3);
+      border: none;
+      border-radius: 5px;
+      transition: background-color 0.3s, transform 0.1s;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+      white-space: nowrap; /* Prevent text from wrapping */
+    }
+
+    header button:hover {
+      background: linear-gradient(145deg, #0056b3, #004b99);
+      transform: translateY(-2px);
+    }
+
+    /* Hamburger Menu for Small Screens */
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      cursor: pointer;
+      gap: 4px;
+    }
+
+    .hamburger div {
+      width: 25px;
+      height: 3px;
+      background-color: #EAEAEA;
+      transition: all 0.3s ease;
+    }
+
+    /* Transform hamburger to 'X' when active */
+    .hamburger.active div:nth-child(1) {
+      transform: rotate(45deg) translate(5px, 5px);
+    }
+
+    .hamburger.active div:nth-child(2) {
+      opacity: 0;
+    }
+
+    .hamburger.active div:nth-child(3) {
+      transform: rotate(-45deg) translate(5px, -5px);
+    }
+
+    /* Splash Screen */
+    #splash-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: #1F2A44;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      opacity: 1;
+      z-index: 10;
+      transition: opacity 1s ease;
+    }
+    #splash-screen.fade-out {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    /* Flashcard Container */
+    #flashcard-container {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      animation: fadeIn 0.5s ease-in;
+      padding: 100px 20px 20px; /* Added top padding to account for fixed header */
+      max-width: 90%;
+      box-sizing: border-box;
+      width: 100%;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    /* File Upload, Download Sample, and Dark Mode Buttons */
+    .top-buttons {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+
+    #download-sample, #dark-mode-toggle {
+      color: #EAEAEA;
+      background-color: #1F2A44;
+      border: none; /* Removed border for a cleaner look */
+      padding: 14px 24px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-size: 1.1rem;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4); /* Enhanced shadow for depth */
+    }
+    #download-sample:hover {
+      background-color: #28a745;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5); /* Shadow lift effect */
+    }
+    #dark-mode-toggle:hover {
+      background: linear-gradient(145deg, #0056b3, #004b99); /* Darker gradient on hover */
+      transform: translateY(-2px); /* Slight lift effect */
+    }
+
+    /* Upload Flashcards Input */
+    #uploadFile {
+      margin-top: 10px;
+      padding: 10px;
+      font-size: 1rem;
+      background-color: #1F2A44;
+      color: #EAEAEA;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+    }
+    #uploadFile:hover {
+      background-color: #0056b3;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Flashcard Styles */
+    #flashcard {
+      perspective: 1500px; /* Increased perspective for better 3D effect */
+      width: 500px;  /* Increased width */
+      height: 350px; /* Increased height */
+      margin-top: 20px;
+      outline: none; /* Remove default focus outline */
+    }
+    .card {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.8s ease;
+      cursor: pointer;
+      /* Removed onclick from .card to prevent double toggling */
+    }
+    .card.flipped {
+      transform: rotateY(180deg);
+    }
+    .card-face {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      border: 3px solid #007BFF;
+      border-radius: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      box-sizing: border-box;
+      text-align: center;
+      background: linear-gradient(145deg, #1F2A44, #0056b3);
+      color: #EAEAEA;
+      font-size: 1.3rem; /* Increased font size for better readability */
+      text-transform: uppercase;
+      box-shadow: 0 0 20px rgba(0, 123, 255, 0.5), 0 0 50px rgba(0, 255, 255, 0.3);
+      transition: background 0.3s;
+    }
+    .card-face.back {
+      transform: rotateY(180deg);
+      background: linear-gradient(145deg, #0056b3, #1F2A44);
+    }
+    .card-face::before, .card-face::after {
+      content: "";
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 15px;
+      top: -5px;
+      left: -5px;
+      right: -5px;
+      bottom: -5px;
+      background: linear-gradient(145deg, transparent, rgba(0, 255, 255, 0.2));
+      z-index: -1;
+      transform: rotate(5deg);
+    }
+
+    /* Text Styles Inside Card */
+    #question-content, #answer-content {
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 1.3em; /* Increased font size for visibility */
+      font-weight: bold;
+      color: inherit;
+      text-shadow: 0px 0px 6px rgba(0, 123, 255, 0.8), 0px 0px 20px rgba(0, 255, 255, 0.4);
+      text-align: center;
+      transition: opacity 0.3s;
+      padding: 20px; /* Increased padding to prevent text from touching edges */
+      word-wrap: break-word; /* Allow text to wrap within the card */
+      overflow: hidden; /* Prevent overflow */
+      height: 100%; /* Allow full height */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Controls, Buttons, and Stats */
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 25px;  /* Increased gap for better spacing */
+      margin-top: 50px;  /* Increased margin above controls */
+    }
+    .controls button {
+      padding: 14px 24px; 
+      font-size: 1.1rem;
+      cursor: pointer;
+      color: #EAEAEA;
+      background: linear-gradient(145deg, #007BFF, #0056b3); /* Added gradient */
+      border: none; /* Removed border for a cleaner look */
+      border-radius: 5px;
+      transition: background-color 0.3s, transform 0.1s;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4); /* Enhanced shadow for depth */
+    }
+    .controls button:hover {
+      background: linear-gradient(145deg, #0056b3, #004b99); /* Darker gradient on hover */
+      transform: translateY(-2px); /* Slight lift effect */
+    }
+    #favorite-status, #stats {
+      margin-top: 25px;  
+      font-weight: bold;
+      font-size: 1.3rem;  
+      text-align: center; /* Centered text */
+    }
+
+    /* Modal styles */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.8);
+      justify-content: center;
+      align-items: center;
+      z-index: 20;
+      padding: 20px; /* Added padding for better spacing */
+      box-sizing: border-box;
+    }
+    .modal-content {
+      background: #1F2A44;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+      max-width: 600px;
+      width: 100%;
+      text-align: center;
+      position: relative;
+    }
+    .modal-content button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 1rem;
+    }
+    .modal-close {
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      background: none;
+      border: none;
+      color: #EAEAEA;
+      font-size: 1.8rem;
+      cursor: pointer;
+    }
+    .modal-close:hover {
+      color: #FF6347;
+    }
+
+    /* Progress Bar */
+    #progress-container {
+      width: 100%;
+      max-width: 500px;
+      background-color: #1F2A44;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-top: 30px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+    }
+    #progress-bar {
+      height: 25px;
+      width: 0%;
+      background: linear-gradient(145deg, #007BFF, #0056b3);
+      transition: width 0.3s;
+    }
+
+    /* Additional Animations */
+    .card-face.front {
+      animation: slideInFront 0.6s ease-out;
+    }
+    .card-face.back {
+      animation: slideInBack 0.6s ease-out;
+    }
+    @keyframes slideInFront {
+      from { transform: translateY(-20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    @keyframes slideInBack {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    /* Dark Mode Styles */
+    body.dark-mode {
+      background-color: #EAEAEA;
+      color: #0B0F1C;
+    }
+    body.dark-mode header {
+      background-color: #0056b3;
+    }
+    body.dark-mode #download-sample,
+    body.dark-mode #dark-mode-toggle,
+    body.dark-mode button,
+    body.dark-mode #uploadFile {
+      background: linear-gradient(145deg, #0056b3, #004b99);
+      color: #0B0F1C;
+    }
+    body.dark-mode .card-face {
+      background: linear-gradient(145deg, #0056b3, #1F2A44);
+      color: #0B0F1C;
+    }
+    body.dark-mode .card-face.back {
+      background: linear-gradient(145deg, #1F2A44, #0056b3);
+    }
+    body.dark-mode .modal-content {
+      background: #0056b3;
+      color: #EAEAEA;
+    }
+    body.dark-mode #progress-container {
+      background-color: #0056b3;
+    }
+    body.dark-mode #progress-bar {
+      background: linear-gradient(145deg, #1F2A44, #0056b3);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 800px) {
+      /* Adjust flashcard size for medium screens */
+      #flashcard {
+        width: 80%;
+        height: 300px;
+      }
+      header h1 {
+        font-size: 1.5rem;
+      }
+      header .header-buttons button {
+        padding: 6px 12px;
+        font-size: 0.9rem;
+      }
+      #download-sample, #dark-mode-toggle {
+        padding: 10px 18px;
+        font-size: 1rem;
+      }
+      #uploadFile {
+        padding: 10px;
+        font-size: 1rem;
+        margin-top: 10px;
+      }
+      .controls {
+        gap: 20px;  /* Adjusted gap for better spacing */
+      }
+      #progress-container {
+        max-width: 80%;
+      }
+    }
+
+    @media (max-width: 600px) {
+      /* Hamburger menu appears on small screens */
+      .hamburger {
+        display: flex;
+      }
+      header .header-buttons {
+        display: none; /* Hide buttons initially */
+        flex-direction: column;
+        background-color: #1F2A44;
+        position: absolute;
+        top: 60px;
+        right: 20px;
+        padding: 10px;
+        border-radius: 5px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      }
+      header .header-buttons.active {
+        display: flex; /* Show buttons when active */
+      }
+      header .header-buttons button {
+        margin: 5px 0;
+      }
+
+      /* Adjust flashcard size for small screens */
+      #flashcard {
+        width: 90%;
+        height: 280px;
+      }
+      #question-content, #answer-content {
+        font-size: 1.1em;
+        padding: 15px;
+      }
+      #progress-container {
+        max-width: 90%;
+      }
+    }
+
+    /* Signature Styles */
+    .signature {
+      position: fixed;
+      bottom: 10px;
+      left: 10px;
+      font-size: 0.9rem;
+      color: rgba(234, 234, 234, 0.6); /* Slightly opaque */
+      font-family: 'Arial', sans-serif;
+      z-index: 100;
+    }
+    @media (max-width: 600px) {
+      .signature {
+        font-size: 0.8rem;
+        left: 5px;
+        bottom: 5px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header with Backup, Restore, and Load Buttons -->
+  <header>
+    <h1>Flashcard App</h1>
+    <div class="header-buttons" id="header-buttons">
+      <button onclick="openBackupModal()" aria-label="Backup Flashcard Sets">💾 Backup</button>
+      <button onclick="openRestoreModal()" aria-label="Restore Flashcard Sets">📂 Restore</button>
+      <button onclick="openLoadModal()" aria-label="Load Flashcard Set">📁 Load</button>
+    </div>
+    <!-- Hamburger Menu Icon -->
+    <div class="hamburger" id="hamburger" onclick="toggleHamburger()" aria-label="Toggle Navigation Menu">
+      <div></div>
+      <div></div>
+      <div></div>
+    </div>
+  </header>
+
+  <!-- Splash Screen -->
+  <div id="splash-screen" role="dialog" aria-labelledby="splash-title">
+    <h1 id="splash-title">Welcome to the Flashcard App</h1>
+  </div>
+
+  <!-- Flashcard Container -->
+  <div id="flashcard-container">
+    <div class="top-buttons">
+      <button id="download-sample" onclick="downloadSample()" aria-label="Download Sample Flashcards">📥 Download Sample</button>
+      <button id="dark-mode-toggle" onclick="toggleDarkMode()" aria-pressed="false">🌓 Toggle Dark Mode</button>
+    </div>
+    <input type="file" id="uploadFile" accept=".xlsx,.csv,.txt" onchange="handleFileUpload(event)" aria-label="Upload Flashcards">
+    <div id="flashcard" tabindex="0" aria-label="Flashcard" role="button" onclick="flipCard()" onkeydown="handleKeyDown(event)">
+      <div class="card" tabindex="0" aria-pressed="false">
+        <div class="card-face front">
+          <p id="question-content">No Card Loaded</p>
+        </div>
+        <div class="card-face back">
+          <p id="answer-content">No Card Loaded</p>
+        </div>
+      </div>
+    </div>
+    <div class="controls">
+      <button onclick="previousCard()" aria-label="Previous Card">⬅️ Previous</button>
+      <button onclick="nextCard()" aria-label="Next Card">Next ➡️</button>
+      <button onclick="toggleFavorite()" aria-label="Toggle Favorite">⭐ Toggle Favorite</button>
+    </div>
+    <div id="favorite-status">Not Favorite</div>
+    <div id="stats">Total Cards: <span id="total-cards">0</span> | Current Card: <span id="current-card">0</span> | Progress: <span id="progress-percent">0%</span></div>
+    <div id="progress-container" aria-label="Progress Bar">
+      <div id="progress-bar"></div>
+    </div>
+  </div>
+
+  <!-- Backup Modal -->
+  <div id="backup-modal" class="modal" role="dialog" aria-labelledby="backup-title" aria-describedby="backup-description">
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeBackupModal()" aria-label="Close Backup Modal">&times;</button>
+      <h2 id="backup-title">Backup Flashcard Sets</h2>
+      <p id="backup-description">Select the flashcard sets you want to backup:</p>
+      <div id="backup-sets">
+        <!-- Dynamically populated list of sets -->
+      </div>
+      <button onclick="backupSets()" aria-label="Download Backup">Download Backup as ZIP</button>
+    </div>
+  </div>
+
+  <!-- Restore Modal -->
+  <div id="restore-modal" class="modal" role="dialog" aria-labelledby="restore-title" aria-describedby="restore-description">
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeRestoreModal()" aria-label="Close Restore Modal">&times;</button>
+      <h2 id="restore-title">Restore Flashcard Sets</h2>
+      <p id="restore-description">Upload a ZIP file containing your backed-up flashcard sets:</p>
+      <input type="file" id="restoreFile" accept=".zip" onchange="handleRestore(event)" aria-label="Upload Backup ZIP">
+      <button onclick="closeRestoreModal()" aria-label="Close Restore Modal">Close</button>
+    </div>
+  </div>
+
+  <!-- Load Modal -->
+  <div id="load-modal" class="modal" role="dialog" aria-labelledby="load-title" aria-describedby="load-description">
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeLoadModal()" aria-label="Close Load Modal">&times;</button>
+      <h2 id="load-title">Load Flashcard Set</h2>
+      <p id="load-description">Select a flashcard set to load:</p>
+      <div id="load-sets">
+        <!-- Dynamically populated list of sets -->
+      </div>
+      <button onclick="closeLoadModal()" aria-label="Close Load Modal">Close</button>
+    </div>
+  </div>
+
+  <!-- Error Modal -->
+  <div id="error-modal" class="modal" role="alertdialog" aria-labelledby="error-title" aria-describedby="error-message">
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeErrorModal()" aria-label="Close Error Modal">&times;</button>
+      <h2 id="error-title">Error</h2>
+      <p id="error-message"></p>
+      <button onclick="closeErrorModal()" aria-label="Close Error Modal">Close</button>
+    </div>
+  </div>
+
+  <!-- Signature -->
+  <div class="signature">
+    This Widget Webpage Tool Is Made by Chris Loetz
+  </div>
+
+  <!-- External Libraries -->
+  <!-- JSZip -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" integrity="sha512-Mk6YyM/5x3BVbylppL3OMVzV2TPQ2XmwI5xVzGhXhqDsu4FhTHwI3SdlGC59Ahc7F+FTzQOWJMBNLKkDutlvgQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <!-- FileSaver.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js" integrity="sha512-5DWhZkzbN8zq1eMd4rCqDH3gi+MFhm7C19k9KC6Ll6iwF0A4P4UBJRnXY/X8jVNgVtxlRjPp3CcY8a2tB/PtfA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <!-- SheetJS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" integrity="sha512-pvD4zVZbgEiv8Bxvb9a2rT5igW8Vnz4t7Qur8xG8J7k8LvHl0FTUnqgRPSjfKl4IW7UBvLEK3g+vdZblvn7G2w==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <!-- JavaScript Code -->
+  <script>
+    let flashcardSets = []; // Array to store multiple flashcard sets
+    let currentSetIndex = null; // Index of the currently active set
+    let favorites = {}; // Object to store favorites per set
+
+    document.addEventListener("DOMContentLoaded", function() {
+      // Fade out splash screen after 2 seconds
+      setTimeout(() => {
+        document.getElementById('splash-screen').classList.add('fade-out');
+        setTimeout(() => {
+          document.getElementById('splash-screen').style.display = 'none';
+          document.getElementById('flashcard-container').style.display = 'flex';
+        }, 1000);
+      }, 2000);
+
+      // Load favorites from localStorage
+      const storedFavorites = localStorage.getItem('favorites');
+      if (storedFavorites) {
+        favorites = JSON.parse(storedFavorites);
+      }
+
+      // Initialize hamburger menu
+      const hamburger = document.getElementById('hamburger');
+      const headerButtons = document.getElementById('header-buttons');
+
+      // Close the menu when clicking outside
+      document.addEventListener('click', function(event) {
+        if (!headerButtons.contains(event.target) && !hamburger.contains(event.target)) {
+          headerButtons.classList.remove('active');
+          hamburger.classList.remove('active');
+        }
+      });
+    });
+
+    // Handle File Upload for New Flashcard Sets
+    function handleFileUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        let data;
+        try {
+          if (file.name.endsWith('.csv') || file.name.endsWith('.txt')) {
+            // Handle CSV and TXT files
+            const csvText = e.target.result;
+            const rows = csvText.split(/\r?\n/);
+            const flashcards = rows.map(row => {
+              const [question, answer] = row.split(',');
+              return {
+                question: question ? question.trim() : 'No Question',
+                answer: answer ? answer.trim() : 'No Answer'
+              };
+            }).filter(card => card.question !== 'No Question' || card.answer !== 'No Answer');
+            
+            if (flashcards.length === 0) {
+              throw new Error("No flashcards found in the file.");
+            }
+
+            // Add new set to flashcardSets
+            flashcardSets.push({
+              name: file.name,
+              flashcards: flashcards
+            });
+            currentSetIndex = flashcardSets.length - 1; // Set the newly uploaded set as active
+            updateLocalStorage();
+            showCard();
+            updateProgress();
+            populateBackupModal();
+            populateLoadModal();
+          } else {
+            // Handle XLSX files
+            data = new Uint8Array(e.target.result);
+            const workbook = XLSX.read(data, { type: 'array', cellDates: true });
+            const sheetName = workbook.SheetNames[0];
+            const worksheet = workbook.Sheets[sheetName];
+            // Convert all rows assuming no headers
+            const flashcards = XLSX.utils.sheet_to_json(worksheet, { header:1 }).map(row => ({
+              question: row[0] || 'No Question',
+              answer: row[1] || 'No Answer'
+            })).filter(card => card.question.trim() !== '' || card.answer.trim() !== '');
+
+            if (flashcards.length === 0) {
+              throw new Error("No flashcards found in the file.");
+            }
+
+            // Add new set to flashcardSets
+            flashcardSets.push({
+              name: file.name,
+              flashcards: flashcards
+            });
+            currentSetIndex = flashcardSets.length - 1; // Set the newly uploaded set as active
+            updateLocalStorage();
+            showCard();
+            updateProgress();
+            populateBackupModal();
+            populateLoadModal();
+          }
+        } catch (error) {
+          console.error(error);
+          showError("There was an error reading the file. Please make sure it's formatted correctly and contains two columns: Questions (A) and Answers (B). Ensure there are no headers.");
+        }
+      };
+      if (file.name.endsWith('.csv') || file.name.endsWith('.txt')) {
+        reader.readAsText(file);
+      } else {
+        reader.readAsArrayBuffer(file);
+      }
+      // Reset the input value to allow uploading the same file again if needed
+      event.target.value = '';
+    }
+
+    // Show the current active flashcard
+    function showCard() {
+      if (currentSetIndex === null || flashcardSets.length === 0) {
+        document.getElementById('question-content').textContent = "No Card Loaded";
+        document.getElementById('answer-content').textContent = "No Card Loaded";
+        document.getElementById('total-cards').textContent = "0";
+        document.getElementById('current-card').textContent = "0";
+        document.getElementById('favorite-status').textContent = "Not Favorite";
+        updateProgress();
+        return;
+      }
+      const currentSet = flashcardSets[currentSetIndex];
+      const flashcards = currentSet.flashcards;
+      const totalCards = flashcards.length;
+      const currentCard = flashcards[currentIndex];
+      document.getElementById('question-content').textContent = currentCard.question;
+      document.getElementById('answer-content').textContent = currentCard.answer;
+      document.getElementById('total-cards').textContent = totalCards;
+      document.getElementById('current-card').textContent = currentIndex + 1;
+      updateFavoriteStatus();
+      updateProgress();
+      // Ensure the card is showing the front side
+      const card = document.querySelector('.card');
+      if (card.classList.contains('flipped')) {
+        card.classList.remove('flipped');
+        card.setAttribute('aria-pressed', 'false');
+      }
+    }
+
+    let currentIndex = 0; // Index of the current flashcard within the active set
+
+    // Flip the flashcard
+    function flipCard() {
+      const card = document.querySelector('.card');
+      card.classList.toggle('flipped');
+      const isFlipped = card.classList.contains('flipped');
+      card.setAttribute('aria-pressed', isFlipped);
+    }
+
+    // Navigate to the next flashcard
+    function nextCard() {
+      if (currentSetIndex === null || flashcardSets.length === 0) return;
+      const totalCards = flashcardSets[currentSetIndex].flashcards.length;
+      currentIndex = (currentIndex + 1) % totalCards;
+      showCard();
+      focusFlashcard();
+    }
+
+    // Navigate to the previous flashcard
+    function previousCard() {
+      if (currentSetIndex === null || flashcardSets.length === 0) return;
+      const totalCards = flashcardSets[currentSetIndex].flashcards.length;
+      currentIndex = (currentIndex - 1 + totalCards) % totalCards;
+      showCard();
+      focusFlashcard();
+    }
+
+    // Toggle favorite status for the current flashcard
+    function toggleFavorite() {
+      if (currentSetIndex === null || flashcardSets.length === 0) return;
+      const currentCardKey = `set-${currentSetIndex}-card-${currentIndex}`;
+      favorites[currentCardKey] = !favorites[currentCardKey];
+      localStorage.setItem('favorites', JSON.stringify(favorites));
+      updateFavoriteStatus();
+    }
+
+    // Update the favorite status display
+    function updateFavoriteStatus() {
+      if (currentSetIndex === null || flashcardSets.length === 0) {
+        document.getElementById('favorite-status').textContent = "Not Favorite";
+        return;
+      }
+      const currentCardKey = `set-${currentSetIndex}-card-${currentIndex}`;
+      const status = favorites[currentCardKey] ? "⭐ Favorite" : "☆ Not Favorite";
+      document.getElementById('favorite-status').textContent = status;
+    }
+
+    // Update the progress bar and percentage
+    function updateProgress() {
+      if (currentSetIndex === null || flashcardSets.length === 0) {
+        document.getElementById('progress-percent').textContent = "0%";
+        document.getElementById('progress-bar').style.width = "0%";
+        return;
+      }
+      const totalCards = flashcardSets[currentSetIndex].flashcards.length;
+      const progress = ((currentIndex + 1) / totalCards) * 100;
+      document.getElementById('progress-percent').textContent = `${Math.round(progress)}%`;
+      document.getElementById('progress-bar').style.width = `${progress}%`;
+    }
+
+    // Show error modal with a message
+    function showError(message) {
+      document.getElementById('error-message').textContent = message;
+      document.getElementById('error-modal').style.display = 'flex';
+      document.getElementById('error-modal').querySelector('.modal-close').focus();
+    }
+
+    // Close Error Modal
+    function closeErrorModal() {
+      document.getElementById('error-modal').style.display = 'none';
+    }
+
+    // Toggle Dark Mode
+    function toggleDarkMode() {
+      document.body.classList.toggle('dark-mode');
+      const toggleButton = document.getElementById('dark-mode-toggle');
+      const isDarkMode = document.body.classList.contains('dark-mode');
+      toggleButton.setAttribute('aria-pressed', isDarkMode);
+    }
+
+    // Handle Keyboard Navigation
+    function handleKeyDown(event) {
+      if (event.key === 'ArrowRight') {
+        nextCard();
+      } else if (event.key === 'ArrowLeft') {
+        previousCard();
+      } else if (event.key === ' ') {
+        event.preventDefault(); // Prevent scrolling
+        flipCard();
+      }
+    }
+
+    // Focus on the flashcard for keyboard interaction
+    function focusFlashcard() {
+      const flashcard = document.getElementById('flashcard');
+      flashcard.focus();
+    }
+
+    // Populate Backup Modal with list of sets
+    function populateBackupModal() {
+      const backupSetsDiv = document.getElementById('backup-sets');
+      backupSetsDiv.innerHTML = ''; // Clear existing content
+      if (flashcardSets.length === 0) {
+        backupSetsDiv.innerHTML = '<p>No flashcard sets to backup.</p>';
+        return;
+      }
+      flashcardSets.forEach((set, index) => {
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.id = `backup-set-${index}`;
+        checkbox.value = index;
+        checkbox.checked = true; // Default to backup all
+
+        const label = document.createElement('label');
+        label.htmlFor = `backup-set-${index}`;
+        label.textContent = set.name;
+
+        const div = document.createElement('div');
+        div.style.marginBottom = '10px';
+        div.style.display = 'flex';
+        div.style.alignItems = 'center';
+        div.style.gap = '10px';
+
+        div.appendChild(checkbox);
+        div.appendChild(label);
+
+        backupSetsDiv.appendChild(div);
+      });
+    }
+
+    // Open Backup Modal
+    function openBackupModal() {
+      populateBackupModal();
+      document.getElementById('backup-modal').style.display = 'flex';
+    }
+
+    // Close Backup Modal
+    function closeBackupModal() {
+      document.getElementById('backup-modal').style.display = 'none';
+    }
+
+    // Backup Selected Sets as ZIP
+    async function backupSets() {
+      const selectedIndices = [];
+      flashcardSets.forEach((set, index) => {
+        const checkbox = document.getElementById(`backup-set-${index}`);
+        if (checkbox.checked) {
+          selectedIndices.push(index);
+        }
+      });
+
+      if (selectedIndices.length === 0) {
+        showError("Please select at least one flashcard set to backup.");
+        return;
+      }
+
+      const zip = new JSZip();
+      selectedIndices.forEach(index => {
+        const set = flashcardSets[index];
+        // Convert flashcards back to a 2D array for XLSX
+        const data = set.flashcards.map(card => [card.question, card.answer]);
+        const worksheet = XLSX.utils.aoa_to_sheet(data);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+        const wbout = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+        zip.file(set.name, wbout);
+      });
+
+      try {
+        const zipContent = await zip.generateAsync({ type: 'blob' });
+        saveAs(zipContent, 'flashcard_backup.zip');
+        closeBackupModal();
+      } catch (error) {
+        console.error(error);
+        showError("An error occurred while creating the backup.");
+      }
+    }
+
+    // Populate Load Modal with list of sets
+    function populateLoadModal() {
+      const loadSetsDiv = document.getElementById('load-sets');
+      loadSetsDiv.innerHTML = ''; // Clear existing content
+      if (flashcardSets.length === 0) {
+        loadSetsDiv.innerHTML = '<p>No flashcard sets to load.</p>';
+        return;
+      }
+      flashcardSets.forEach((set, index) => {
+        const button = document.createElement('button');
+        button.textContent = set.name;
+        button.style.margin = '10px';
+        button.onclick = () => {
+          currentSetIndex = index;
+          currentIndex = 0; // Reset to first card
+          showCard();
+          closeLoadModal();
+        };
+        loadSetsDiv.appendChild(button);
+      });
+    }
+
+    // Open Load Modal
+    function openLoadModal() {
+      populateLoadModal();
+      document.getElementById('load-modal').style.display = 'flex';
+    }
+
+    // Close Load Modal
+    function closeLoadModal() {
+      document.getElementById('load-modal').style.display = 'none';
+    }
+
+    // Open Restore Modal
+    function openRestoreModal() {
+      document.getElementById('restore-modal').style.display = 'flex';
+    }
+
+    // Close Restore Modal
+    function closeRestoreModal() {
+      document.getElementById('restore-modal').style.display = 'none';
+    }
+
+    // Handle Restore from ZIP
+    async function handleRestore(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = async function(e) {
+        const zip = new JSZip();
+        try {
+          const zipContent = await zip.loadAsync(e.target.result);
+          const files = Object.keys(zip.files).filter(filename => filename.endsWith('.xlsx') || filename.endsWith('.csv') || filename.endsWith('.txt'));
+          if (files.length === 0) {
+            throw new Error("No valid flashcard files found in the ZIP.");
+          }
+          for (const filename of files) {
+            const fileData = await zip.files[filename].async('arraybuffer');
+            let flashcards = [];
+            if (filename.endsWith('.xlsx') || filename.endsWith('.xls')) {
+              const workbook = XLSX.read(fileData, { type: 'array', cellDates: true });
+              const sheetName = workbook.SheetNames[0];
+              const worksheet = workbook.Sheets[sheetName];
+              // Convert all rows assuming no headers
+              flashcards = XLSX.utils.sheet_to_json(worksheet, { header:1 }).map(row => ({
+                question: row[0] || 'No Question',
+                answer: row[1] || 'No Answer'
+              })).filter(card => card.question.trim() !== '' || card.answer.trim() !== '');
+            } else if (filename.endsWith('.csv') || filename.endsWith('.txt')) {
+              const csvText = new TextDecoder("utf-8").decode(fileData);
+              const rows = csvText.split(/\r?\n/);
+              flashcards = rows.map(row => {
+                const [question, answer] = row.split(',');
+                return {
+                  question: question ? question.trim() : 'No Question',
+                  answer: answer ? answer.trim() : 'No Answer'
+                };
+              }).filter(card => card.question.trim() !== '' || card.answer.trim() !== '');
+            }
+            if (flashcards.length === 0) continue; // Skip empty sets
+            // Add to flashcardSets
+            flashcardSets.push({
+              name: filename,
+              flashcards: flashcards
+            });
+          }
+          updateLocalStorage();
+          showCard();
+          updateProgress();
+          populateBackupModal();
+          populateLoadModal();
+          closeRestoreModal();
+        } catch (error) {
+          console.error(error);
+          showError("There was an error restoring the backup. Please ensure the ZIP file is valid and contains properly formatted flashcard sets.");
+        }
+      };
+      reader.readAsArrayBuffer(file);
+      // Reset the input value to allow uploading the same file again if needed
+      event.target.value = '';
+    }
+
+    // Populate Backup and Load Modals when a new set is added
+    function updateLocalStorage() {
+      // Currently, favorites are already updated during toggleFavorite
+      // You can extend this function to save more state if needed
+    }
+
+    // Hamburger Menu Toggle Function
+    function toggleHamburger() {
+      const hamburger = document.getElementById('hamburger');
+      const headerButtons = document.getElementById('header-buttons');
+      hamburger.classList.toggle('active');
+      headerButtons.classList.toggle('active');
+    }
+
+    // Download Sample Flashcards
+    async function downloadSample() {
+      try {
+        // Define sample flashcards without headers
+        const sampleData = [
+          ["What is the capital of France?", "Paris"],
+          ["What is 2 + 2?", "4"],
+          ["Who wrote 'To Kill a Mockingbird'?", "Harper Lee"],
+          ["What is the largest planet in our Solar System?", "Jupiter"],
+          ["What element does 'O' represent on the periodic table?", "Oxygen"]
+        ];
+
+        // Create a worksheet for XLSX
+        const worksheetXLSX = XLSX.utils.aoa_to_sheet(sampleData);
+        // Create a new workbook and append the worksheet
+        const workbookXLSX = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbookXLSX, worksheetXLSX, "Sample Flashcards");
+        // Generate XLSX file as binary array
+        const wboutXLSX = XLSX.write(workbookXLSX, { bookType: 'xlsx', type: 'array' });
+
+        // Create a worksheet for CSV
+        const worksheetCSV = XLSX.utils.aoa_to_sheet(sampleData);
+        // Convert the worksheet to CSV
+        const csvContent = XLSX.utils.sheet_to_csv(worksheetCSV);
+
+        // Initialize JSZip
+        const zip = new JSZip();
+        // Add XLSX file to ZIP
+        zip.file("sample_flashcards.xlsx", wboutXLSX);
+        // Add CSV file to ZIP
+        zip.file("sample_flashcards.csv", csvContent);
+
+        // Generate ZIP and trigger download
+        const zipContent = await zip.generateAsync({ type: 'blob' });
+        saveAs(zipContent, "sample_flashcards.zip");
+      } catch (err) {
+        console.error("Error generating ZIP:", err);
+        showError("An error occurred while generating the sample files.");
+      }
+    }
+
+    // Backup and Load Modals will be populated dynamically before opening
+  </script>
+</body>
+</html>
