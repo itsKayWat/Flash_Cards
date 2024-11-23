@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Tools - Read Me</title>
+    <style>
+        /* Basic Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background-color: #121212;
+            color: #e0e0e0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            color: #ffd700;
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        h2 {
+            color: #ffd700;
+            font-size: 2rem;
+            margin: 1.5rem 0 0.5rem 0;
+        }
+
+        h3 {
+            color: #ffd700;
+            font-size: 1.5rem;
+            margin: 1rem 0 0.5rem 0;
+        }
+
+        p {
+            color: #ccc;
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .container {
+            background-color: #1e1e1e;
+            border-radius: 10px;
+            padding: 30px;
+            width: 100%;
+            max-width: 800px;
+            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.5);
+        }
+
+        .section {
+            margin-bottom: 20px;
+        }
+
+        .code-block {
+            background-color: #2e2e2e;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+
+        ul {
+            list-style-type: disc;
+            margin-left: 20px;
+        }
+
+        a {
+            color: #ffd700;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            margin-top: 20px;
+            background-color: #ffd700;
+            color: #121212;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .button:hover {
+            background-color: #e0c200;
+            color: #ffffff;
+        }
+
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #777;
+        }
+
+        .footer a {
+            color: #ffd700;
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* License Section Styling */
+        .license-section {
+            background-color: #1e1e1e;
+            border: 2px solid #ffd700;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 30px;
+        }
+
+        .license-section h2 {
+            font-size: 1.75rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .license-section p {
+            font-size: 0.95rem;
+            color: #ccc;
+            line-height: 1.6;
+        }
+
+        /* Signature Styling */
+        .signature {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            font-size: 0.9rem;
+            color: rgba(224, 224, 224, 0.7);
+            font-style: italic;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            h2 {
+                font-size: 1.75rem;
+            }
+
+            h3 {
+                font-size: 1.25rem;
+            }
+
+            p {
+                font-size: 0.9rem;
+            }
+
+            .button {
+                font-size: 0.9rem;
+                padding: 8px 16px;
+            }
+
+            .license-section h2 {
+                font-size: 1.5rem;
+            }
+
+            .license-section p {
+                font-size: 0.85rem;
+            }
+
+            .signature {
+                font-size: 0.8rem;
+                bottom: 15px;
+                left: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>PDF Tools - Read Me</h1>
+    </header>
+
+    <div class="container">
+        <div class="section">
+            <h2>Introduction</h2>
+            <p>
+                Welcome to the PDF Tools Read Me page! This toolset provides a comprehensive suite of utilities designed to simplify your PDF-related tasks. Whether you need to convert, compress, or customize your PDF documents, our tools are here to help you achieve your goals efficiently and effortlessly.
+            </p>
+        </div>
+
+        <div class="section">
+            <h2>Purpose</h2>
+            <p>
+                The PDF Tools were created to address the common challenges users face when handling PDF files. By offering a range of functionalities in one place, we aim to eliminate the need for multiple applications, providing a seamless and integrated experience for all your PDF needs.
+            </p>
+        </div>
+
+        <div class="section">
+            <h2>Features</h2>
+            <ul>
+                <li><strong>PNG to PDF:</strong> Convert your PNG images into high-quality PDF documents.</li>
+                <li><strong>JPG to PDF:</strong> Seamlessly transform your JPG photos into PDF files.</li>
+                <li><strong>PDF to DOC:</strong> Extract text from PDF files and convert them into editable DOC documents.</li>
+                <li><strong>DOC to PDF:</strong> Convert your DOC or DOCX files into secure PDF documents.</li>
+                <li><strong>PDF to JPG:</strong> Extract images from PDF files and save them as JPGs.</li>
+                <li><strong>PDF to PNG:</strong> Convert PDF pages into PNG images.</li>
+                <li><strong>PDF Compressor:</strong> Reduce the size of your PDF files without compromising quality.</li>
+                <li><strong>Combine PDF:</strong> Merge multiple PDF documents into a single file.</li>
+                <li><strong>Crop PDF:</strong> Adjust the visible area of your PDF pages to meet your specific requirements.</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>Why It Was Created</h2>
+            <p>
+                Handling PDFs can often require juggling multiple tools, each specializing in a single function. This fragmentation can be time-consuming and inefficient. PDF Tools consolidates all essential PDF functionalities into one platform, streamlining your workflow and saving you valuable time.
+            </p>
+        </div>
+
+        <div class="section">
+            <h2>How to Use</h2>
+            <p>
+                Using PDF Tools is simple and intuitive. Follow these steps to get started:
+            </p>
+            <ol>
+                <li><strong>Select a Tool:</strong> Choose the desired PDF utility from the list of available tools by clicking on the corresponding tab.</li>
+                <li><strong>Upload Files:</strong> Click on the upload section to select the files you want to process. Depending on the tool, you can upload images, PDFs, or DOC/DOCX files.</li>
+                <li><strong>Process:</strong> Once the files are uploaded, the tool will automatically start processing them. A progress bar will indicate the status of the operation.</li>
+                <li><strong>Download:</strong> After processing, the converted or modified files will be available for download. You can also open them directly in a new tab.</li>
+                <li><strong>Additional Features:</strong> Explore additional features and options provided by each tool to customize the output according to your needs.</li>
+            </ol>
+        </div>
+
+        <div class="section">
+            <h2>Example Use Case</h2>
+            <p>
+                Imagine you're a student who has scanned several handwritten notes in JPG format and wants to compile them into a single PDF for easier sharing and printing. With the <strong>JPG to PDF</strong> tool, you can effortlessly convert all your images into one consolidated PDF document in just a few clicks. This eliminates the hassle of handling multiple image files and ensures your notes are neatly organized.
+            </p>
+        </div>
+
+        <a href="https://sites.google.com/view/gvtechhub-kb/technician/png-to-pdf" class="button">Go to PNG to PDF Tool</a>
+    </div>
+
+    <div class="license-section">
+        <h2>Usage Agreement</h2>
+        <p>
+            This PDF Tools widget webpage is intended for internal use only. Unauthorized copying, modification, distribution, tampering, adjustment, viewing, analysis, or interpretation of this software is strictly prohibited. As the developer, I retain all rights to approve or deny any use of this tool. You may use the tool solely as described in this document and only with my explicit permission and approval. Any usage outside of these terms is not permitted.
+        </p>
+    </div>
+
+    <div class="signature">
+        This Widget Webpage Tool Is Made by Chris Loetz
+    </div>
+
+    <div class="footer">
+        <p>Explore more tools and enhance your productivity with our <a href="tool-suite.html">Tool Suite</a>.</p>
+    </div>
+</body>
+</html>
