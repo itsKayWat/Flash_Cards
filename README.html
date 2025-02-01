@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Flashcard App - Read Me</title>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script&display=swap" rel="stylesheet">
   <style>
     /* Global and Layout Styles */
     body {
@@ -130,6 +131,51 @@
         padding: 15px;
       }
     }
+
+    .support-section {
+      background-color: #1F2A44;
+      border: 2px solid #007BFF;
+      border-radius: 10px;
+      padding: 2rem;
+      margin: 2rem 0;
+      box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+    }
+
+    .developer-signature {
+      text-align: center;
+    }
+
+    .coffee-options {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin: 1.5rem 0;
+      flex-wrap: wrap;
+    }
+
+    .coffee-btn {
+      background: linear-gradient(145deg, #007BFF, #0056b3);
+      color: #EAEAEA;
+      padding: 0.8rem 1.5rem;
+      border-radius: 25px;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+    }
+
+    .coffee-btn:hover {
+      transform: translateY(-2px);
+      background: linear-gradient(145deg, #0056b3, #004b99);
+      text-decoration: none;
+    }
+
+    .dev-signature {
+      font-family: 'Dancing Script', cursive;
+      color: #007BFF;
+      margin-top: 1.5rem;
+      opacity: 0.8;
+      font-size: 1.2rem;
+    }
   </style>
 </head>
 <body>
@@ -246,6 +292,21 @@
     <p>
       Usage of this tool is at my discretion, and it must be utilized solely in the manner I have outlined. Any unauthorized use may result in revocation of access privileges and potential legal action.
     </p>
+  </div>
+
+  <!-- Support Section -->
+  <div class="content support-section">
+    <h2>Support the Developer</h2>
+    <div class="developer-signature">
+      <p>👋 Hi, I'm KayWat! I created both this tool and this documentation page to help developers like you.</p>
+      <p>If you find this tool valuable, consider supporting my work:</p>
+      <div class="coffee-options">
+        <a href="https://www.paypal.com/donate/?hosted_button_id=J3ABMPG6MQF3L&custom=1coffee" class="coffee-btn">☕ One Coffee ($6)</a>
+        <a href="https://www.paypal.com/donate/?hosted_button_id=J3ABMPG6MQF3L&custom=2coffees" class="coffee-btn">☕☕ Two Coffees ($12)</a>
+        <a href="https://www.paypal.com/donate/?hosted_button_id=J3ABMPG6MQF3L&custom=3coffees" class="coffee-btn">☕☕☕ Three Coffees ($24)</a>
+      </div>
+      <p class="dev-signature">Made with ❤️ by KayWat</p>
+    </div>
   </div>
 
   <!-- Footer -->
